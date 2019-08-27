@@ -4,7 +4,7 @@ namespace Leeovery\LaravelNewsletter;
 
 use Illuminate\Support\ServiceProvider;
 
-class LaravelNewsletterServiceProvider extends ServiceProvider
+class NewsletterServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
@@ -34,7 +34,7 @@ class LaravelNewsletterServiceProvider extends ServiceProvider
             );
         });
 
-        $this->app->alias('laravel-newsletter', 'newsletter');
+        $this->app->alias(Newsletter::class, 'newsletter');
     }
 
     /**

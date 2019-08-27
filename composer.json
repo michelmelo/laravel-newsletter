@@ -44,12 +44,12 @@
     },
     "extra": {
         "laravel": {
-            "providers": [
-                "Leeovery\\LaravelNewsletter\\LaravelNewsletterServiceProvider"
-            ],
-            "aliases": {
-                "LaravelNewsletter": "Leeovery\\LaravelNewsletter\\LaravelNewsletterFacade"
-            }
+          "providers": [
+            "Leeovery\\LaravelNewsletter\\NewsletterServiceProvider"
+          ],
+          "aliases": {
+            "Newsletter": "Leeovery\\LaravelNewsletter\\NewsletterFacade"
+          }
         }
     }
 }
