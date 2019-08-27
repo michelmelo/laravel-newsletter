@@ -172,8 +172,11 @@ class SendInBlueProvider implements Newsletter
 
     public function sendCampaign()
     {
-
         // broadcastCampaignToList
+
+        // make campaign and send to specific list
+
+
 
     }
 
