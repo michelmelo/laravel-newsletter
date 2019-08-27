@@ -6,11 +6,6 @@ use Exception;
 
 class LaravelNewsletterException extends Exception
 {
-    public static function defaultListDoesNotExist($defaultList)
-    {
-        return new static("Default list ({$defaultList}) does not existing.");
-    }
-
     public static function noListWithName($name)
     {
         return new static("The list named '{$name}' does not exist.");

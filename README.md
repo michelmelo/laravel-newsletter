@@ -1,11 +1,9 @@
-# Very short description of the package
+# Driver-based Newsletter provider for Laravel
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/leeovery/laravel-newsletter.svg?style=flat-square)](https://packagist.org/packages/leeovery/laravel-newsletter)
-[![Build Status](https://img.shields.io/travis/leeovery/laravel-newsletter/master.svg?style=flat-square)](https://travis-ci.org/leeovery/laravel-newsletter)
-[![Quality Score](https://img.shields.io/scrutinizer/g/leeovery/laravel-newsletter.svg?style=flat-square)](https://scrutinizer-ci.com/g/leeovery/laravel-newsletter)
 [![Total Downloads](https://img.shields.io/packagist/dt/leeovery/laravel-newsletter.svg?style=flat-square)](https://packagist.org/packages/leeovery/laravel-newsletter)
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what PSRs you support to avoid any confusion with users and contributors.
+Driver-based Newsletter provider for Laravel. Comes with a SendInBlue provider. PRs are welcome for more providers. Ill add more if I can find the time...
 
 ## Installation
 
@@ -15,10 +13,17 @@ You can install the package via composer:
 composer require leeovery/laravel-newsletter
 ```
 
+If you want to use the SendInBlue provider then you need to install their SDK as well:
+
+```bash
+composer require sendinblue/api-v3-sdk
+```
+
+
 ## Usage
 
 ``` php
-// Usage description here
+// coming soon...
 ```
 
 ### Testing

@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnhandledExceptionInspection */
 
 namespace Leeovery\LaravelNewsletter;
 
@@ -7,47 +7,42 @@ use Leeovery\LaravelNewsletter\Exceptions\LaravelNewsletterException;
 
 class NewsletterListCollection extends Collection
 {
-    /** @var string */
+    /**
+     * @var string
+     */
     public $defaultListName = '';
 
+    /**
+     * @param  array  $config
+     * @return NewsletterListCollection
+     */
     public static function createFromConfig(array $config)
     {
-        $collection = new static();
-
-        foreach ($config['lists'] as $name => $listProperties) {
-            $collection->push(new NewsletterList($name, $listProperties));
-        }
-
-        $collection->defaultListName = $config['default_list_name'];
-
-        return $collection;
+        return tap(new static($config['lists']), function ($collection) use ($config) {
+            return value($collection->defaultListName = $config['default_list_name']);
+        })->transform(function ($listProperties, $name) {
+            return new NewsletterList($name, $listProperties);
+        });
     }
 
     public function findByName(string $name): NewsletterList
     {
         if ($name === '') {
-            return $this->getDefault();
+            $name = $this->defaultListName;
         }
 
-        /** @var NewsletterList $newsletterList */
-        foreach ($this->items as $newsletterList) {
+        $list = $this->first(function (NewsletterList $newsletterList) use ($name) {
             if ($newsletterList->getName() === $name) {
                 return $newsletterList;
             }
-        }
 
-        throw LaravelNewsletterException::noListWithName($name);
-    }
+            return null;
+        });
 
-    public function getDefault(): NewsletterList
-    {
-        /** @var NewsletterList $newsletterList */
-        foreach ($this->items as $newsletterList) {
-            if ($newsletterList->getName() === $this->defaultListName) {
-                return $newsletterList;
-            }
-        }
-
-        throw LaravelNewsletterException::defaultListDoesNotExist($this->defaultListName);
+        return tap($list, function ($list) use ($name) {
+            throw_if(is_null($list),
+                LaravelNewsletterException::noListWithName($name)
+            );
+        });
     }
 }

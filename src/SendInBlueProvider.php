@@ -15,6 +15,7 @@ use SendinBlue\Client\Api\EmailCampaignsApi;
 use SendinBlue\Client\Model\AddContactToList;
 use SendinBlue\Client\Model\CreateEmailCampaign;
 use SendinBlue\Client\Model\RemoveContactFromList;
+use Leeovery\LaravelNewsletter\Contracts\Newsletter;
 use Leeovery\LaravelNewsletter\Exceptions\LaravelNewsletterException;
 
 class SendInBlueProvider implements Newsletter
@@ -57,7 +58,7 @@ class SendInBlueProvider implements Newsletter
 
     /**
      * @param  string  $email
-     * @return mixed
+     * @return bool
      */
     public function unsubscribe(string $email)
     {
@@ -85,7 +86,7 @@ class SendInBlueProvider implements Newsletter
     /**
      * @param  string             $email
      * @param  array|string|null  $listNames
-     * @return mixed
+     * @return bool
      */
     public function addToLists(string $email, $listNames = null)
     {
@@ -152,7 +153,7 @@ class SendInBlueProvider implements Newsletter
     /**
      * @param  string             $email
      * @param  array|string|null  $listNames
-     * @return mixed
+     * @return bool
      */
     public function removeFromLists(string $email, $listNames = null)
     {
@@ -181,7 +182,7 @@ class SendInBlueProvider implements Newsletter
      * @param  string             $subject
      * @param  string             $replyTo
      * @param  string|array|null  $listNames
-     * @param  Carbon|null        $scheduledAt  UTC date-time (YYYY-MM-DDTHH:mm:ss.SSSZ)
+     * @param  Carbon|null        $scheduledAt
      * @return bool
      */
     public function sendCampaign(
@@ -208,7 +209,7 @@ class SendInBlueProvider implements Newsletter
                     'htmlContent' => $htmlContent,
                     'subject'     => $subject,
                     'replyTo'     => $replyTo,
-                    'scheduledAt' => $scheduledAt ?? now()->addMinutes(10)->toISOString(),
+                    'scheduledAt' => value($scheduledAt ?? now()->addMinutes(10))->toISOString(),
                 ])
             );
 
@@ -231,7 +232,7 @@ class SendInBlueProvider implements Newsletter
     /**
      * @param  string  $oldEmail
      * @param  string  $newEmail
-     * @return mixed
+     * @return bool
      */
     public function updateEmailAddress(string $oldEmail, string $newEmail)
     {
@@ -254,8 +255,9 @@ class SendInBlueProvider implements Newsletter
 
     public function getApi()
     {
-        // switch block here to return various API instances...
-
-        return $this->getContactsAPIInstance();
+        return [
+            'ContactsApi'       => $this->getContactsAPIInstance(),
+            'EmailCampaignsApi' => $this->getCampaignAPIInstance(),
+        ];
     }
 }

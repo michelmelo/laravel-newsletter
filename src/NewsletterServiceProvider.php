@@ -23,18 +23,14 @@ class NewsletterServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Automatically apply the package configuration
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'newsletter');
 
-        // Register the main class to use with the facade
         $this->app->singleton('newsletter', function ($app) {
             return new NewsletterManager($app,
                 NewsletterListCollection::createFromConfig(config('newsletter')),
                 config('newsletter')
             );
         });
-
-        $this->app->alias(Newsletter::class, 'newsletter');
     }
 
     /**

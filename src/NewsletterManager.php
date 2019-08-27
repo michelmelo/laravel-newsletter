@@ -34,13 +34,16 @@ class NewsletterManager extends Manager
     }
 
     /**
-     * Create a Null SMS driver instance.
+     * Create a Null Provider driver instance.
      */
     public function createNullDriver()
     {
         return new NullDriver;
     }
 
+    /**
+     * @return SendInBlueProvider
+     */
     public function createSendInBlueDriver()
     {
         return new SendInBlueProvider(
