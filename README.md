@@ -19,6 +19,11 @@ If you want to use the SendInBlue provider then you need to install their SDK as
 composer require sendinblue/api-v3-sdk
 ```
 
+Publish the config file to setup your newsletter provider:
+
+```bash
+php artisan vendor:publish --provider="Leeovery\LaravelNewsletter\NewsletterServiceProvider" --tag="config"
+```
 
 ## Usage
 
