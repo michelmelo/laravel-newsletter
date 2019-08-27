@@ -4,13 +4,16 @@ namespace Leeovery\LaravelNewsletter;
 
 use Exception;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use GuzzleHttp\Client as HttpClient;
 use SendinBlue\Client\Configuration;
 use SendinBlue\Client\Api\ContactsApi;
 use SendinBlue\Client\Model\CreateContact;
 use SendinBlue\Client\Model\UpdateContact;
+use SendinBlue\Client\Api\EmailCampaignsApi;
 use SendinBlue\Client\Model\AddContactToList;
+use SendinBlue\Client\Model\CreateEmailCampaign;
 use SendinBlue\Client\Model\RemoveContactFromList;
 use Leeovery\LaravelNewsletter\Exceptions\LaravelNewsletterException;
 
@@ -170,14 +173,59 @@ class SendInBlueProvider implements Newsletter
         return false;
     }
 
-    public function sendCampaign()
+    /**
+     * @param  string             $campaignName
+     * @param  string             $fromEmail
+     * @param  string             $fromName
+     * @param  string             $htmlContent
+     * @param  string             $subject
+     * @param  string             $replyTo
+     * @param  string|array|null  $listNames
+     * @param  Carbon|null        $scheduledAt  UTC date-time (YYYY-MM-DDTHH:mm:ss.SSSZ)
+     * @return bool
+     */
+    public function sendCampaign(
+        string $campaignName,
+        string $fromEmail,
+        string $fromName,
+        string $htmlContent,
+        string $subject,
+        string $replyTo,
+        $listNames = null,
+        Carbon $scheduledAt = null
+    ) {
+        try {
+            $this->getCampaignAPIInstance()->createEmailCampaign(
+                new CreateEmailCampaign([
+                    'name'        => $campaignName,
+                    'sender'      => [
+                        'email' => $fromEmail,
+                        'name'  => $fromName,
+                    ],
+                    'recipients'  => [
+                        'listIds' => $this->getListIdsFromNames($listNames)->all(),
+                    ],
+                    'htmlContent' => $htmlContent,
+                    'subject'     => $subject,
+                    'replyTo'     => $replyTo,
+                    'scheduledAt' => $scheduledAt ?? now()->addMinutes(10)->toISOString(),
+                ])
+            );
+
+            return true;
+        } catch (Exception $e) {
+            LaravelNewsletterException::sendCampaignFailed($e->getMessage());
+        }
+
+        return false;
+    }
+
+    /**
+     * @return EmailCampaignsApi
+     */
+    private function getCampaignAPIInstance(): EmailCampaignsApi
     {
-        // broadcastCampaignToList
-
-        // make campaign and send to specific list
-
-
-
+        return new EmailCampaignsApi($this->guzzle, $this->config);
     }
 
     /**

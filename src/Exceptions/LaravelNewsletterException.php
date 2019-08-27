@@ -40,4 +40,9 @@ class LaravelNewsletterException extends Exception
     {
         return new static("Updating user's email address failed with message: {$message}");
     }
+
+    public static function sendCampaignFailed(string $message)
+    {
+        return new static("Sending campaign failed with message: {$message}");
+    }
 }

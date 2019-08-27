@@ -4,9 +4,6 @@ namespace Leeovery\LaravelNewsletter;
 
 use Illuminate\Support\Facades\Facade;
 
-/**
- * @see \Leeovery\LaravelNewsletter\Skeleton\SkeletonClass
- */
 class LaravelNewsletterFacade extends Facade
 {
     /**

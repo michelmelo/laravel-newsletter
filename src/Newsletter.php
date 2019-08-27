@@ -2,6 +2,8 @@
 
 namespace Leeovery\LaravelNewsletter;
 
+use Illuminate\Support\Carbon;
+
 interface Newsletter
 {
     /**
@@ -32,7 +34,27 @@ interface Newsletter
      */
     public function removeFromLists(string $email, $listNames = null);
 
-    public function sendCampaign();
+    /**
+     * @param  string             $campaignName
+     * @param  string             $fromEmail
+     * @param  string             $fromName
+     * @param  string             $htmlContent
+     * @param  string             $subject
+     * @param  string             $replyTo
+     * @param  string|array|null  $listNames
+     * @param  Carbon|null        $scheduledAt
+     * @return bool
+     */
+    public function sendCampaign(
+        string $campaignName,
+        string $fromEmail,
+        string $fromName,
+        string $htmlContent,
+        string $subject,
+        string $replyTo,
+        $listNames = null,
+        Carbon $scheduledAt = null
+    );
 
     /**
      * @param  string  $oldEmail

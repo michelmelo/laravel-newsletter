@@ -33,6 +33,8 @@ class LaravelNewsletterServiceProvider extends ServiceProvider
                 config('newsletter')
             );
         });
+
+        $this->app->alias('laravel-newsletter', 'newsletter');
     }
 
     /**
