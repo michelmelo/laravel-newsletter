@@ -24,6 +24,13 @@ interface Newsletter
     public function unsubscribe(string $email);
 
     /**
+     * @param  string  $email
+     * @return mixed
+     * @throws LaravelNewsletterException
+     */
+    public function resubscribe(string $email);
+
+    /**
      * @param  string             $email
      * @param  array|string|null  $listNames
      * @return bool

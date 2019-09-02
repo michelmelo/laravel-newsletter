@@ -312,4 +312,24 @@ class SendInBlueProvider implements Newsletter
 
         return false;
     }
+
+    /**
+     * @param  string  $email
+     * @return mixed
+     * @throws LaravelNewsletterException
+     */
+    public function resubscribe(string $email)
+    {
+        try {
+            return $this->getContactsAPIInstance()->updateContact($email,
+                new UpdateContact(['emailBlacklisted' => false])
+            );
+        } catch (Exception $e) {
+            if ($e->getCode() !== 404) {
+                LaravelNewsletterException::reSubscribeFailed($e->getMessage());
+            }
+        }
+
+        return false;
+    }
 }
