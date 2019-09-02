@@ -50,4 +50,9 @@ class LaravelNewsletterException extends Exception
     {
         throw new static("Check subscription status of user failed with message: {$message}");
     }
+
+    public static function reSubscribeFailed(string $message)
+    {
+        throw new static("Resubscribing user failed with message: {$message}");
+    }
 }
