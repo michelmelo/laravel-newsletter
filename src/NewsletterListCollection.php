@@ -40,9 +40,7 @@ class NewsletterListCollection extends Collection
         });
 
         return tap($list, function ($list) use ($name) {
-            throw_if(is_null($list),
-                LaravelNewsletterException::noListWithName($name)
-            );
+            throw_if(is_null($list), LaravelNewsletterException::noListWithName($name));
         });
     }
 }
