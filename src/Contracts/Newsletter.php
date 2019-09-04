@@ -48,24 +48,24 @@ interface Newsletter
 
     /**
      * @param  string             $campaignName
+     * @param  string             $subject
+     * @param  string             $htmlContent
+     * @param  string|array|null  $listNames
      * @param  string             $fromEmail
      * @param  string             $fromName
-     * @param  string             $htmlContent
-     * @param  string             $subject
      * @param  string             $replyTo
-     * @param  string|array|null  $listNames
      * @param  Carbon|null        $scheduledAt
      * @return bool
      * @throws LaravelNewsletterException
      */
     public function sendCampaign(
         string $campaignName,
-        string $fromEmail,
-        string $fromName,
-        string $htmlContent,
         string $subject,
-        string $replyTo,
+        string $htmlContent,
         $listNames = null,
+        $fromEmail = null,
+        $fromName = null,
+        $replyTo = null,
         Carbon $scheduledAt = null
     );
 
