@@ -3,7 +3,9 @@
 namespace Leeovery\LaravelNewsletter;
 
 use Exception;
+use ReflectionException;
 use Illuminate\Support\Arr;
+use Illuminate\Mail\Mailable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use GuzzleHttp\Client as HttpClient;
@@ -168,59 +170,6 @@ class SendInBlueProvider implements Newsletter
     }
 
     /**
-     * @param  string             $campaignName
-     * @param  string             $subject
-     * @param  string             $htmlContent
-     * @param  string|array|null  $listNames
-     * @param  string|null        $fromEmail
-     * @param  string|null        $fromName
-     * @param  string|null        $replyTo
-     * @param  Carbon|null        $scheduledAt
-     * @return bool
-     */
-    public function sendCampaign(
-        string $campaignName,
-        string $subject,
-        string $htmlContent,
-        $listNames = null,
-        $fromEmail = null,
-        $fromName = null,
-        $replyTo = null,
-        Carbon $scheduledAt = null
-    ) {
-        try {
-            $this->getCampaignAPIInstance()->createEmailCampaign(
-                new CreateEmailCampaign([
-                    'name'        => $campaignName,
-                    'htmlContent' => $htmlContent,
-                    'subject'     => $subject,
-                    'recipients'  => [
-                        'listIds' => $this->getListIdsFromNames($listNames)->all(),
-                    ],
-                    'sender'      => [
-                        'email' => $fromEmail ?? config('mail.from.address'),
-                        'name'  => $fromName ?? config('mail.from.name'),
-                    ],
-                    'replyTo'     => $replyTo,
-                    'scheduledAt' => value($scheduledAt ?? now()->addMinutes(5))->toISOString(),
-                ])
-            );
-
-            return true;
-        } catch (Exception $e) {
-            throw LaravelNewsletterException::sendCampaignFailed($e->getMessage());
-        }
-    }
-
-    /**
-     * @return EmailCampaignsApi
-     */
-    private function getCampaignAPIInstance(): EmailCampaignsApi
-    {
-        return new EmailCampaignsApi($this->guzzle, $this->config);
-    }
-
-    /**
      * @param  string  $oldEmail
      * @param  string  $newEmail
      * @return bool
@@ -248,6 +197,14 @@ class SendInBlueProvider implements Newsletter
             'ContactsApi'       => $this->getContactsAPIInstance(),
             'EmailCampaignsApi' => $this->getCampaignAPIInstance(),
         ];
+    }
+
+    /**
+     * @return EmailCampaignsApi
+     */
+    private function getCampaignAPIInstance(): EmailCampaignsApi
+    {
+        return new EmailCampaignsApi($this->guzzle, $this->config);
     }
 
     /**
@@ -310,5 +267,84 @@ class SendInBlueProvider implements Newsletter
         }
 
         return false;
+    }
+
+    /**
+     * @param  Mailable           $mailable
+     * @param  array|string|null  $listNames
+     * @param  string|null        $fromEmail
+     * @param  string|null        $fromName
+     * @param  string|null        $replyTo
+     * @param  Carbon|null        $scheduledAt
+     * @param  string|null        $campaignName
+     * @return mixed
+     * @throws ReflectionException
+     */
+    public function sendMailableToList(
+        Mailable $mailable,
+        $listNames = null,
+        $fromEmail = null,
+        $fromName = null,
+        $replyTo = null,
+        Carbon $scheduledAt = null,
+        $campaignName = null
+    ) {
+        $view = $mailable->render();
+
+        return $this->sendCampaign(
+            $campaignName ?? class_basename($mailable),
+            $mailable->subject,
+            $view,
+            $listNames,
+            $fromEmail,
+            $fromName,
+            $replyTo,
+            $scheduledAt
+        );
+    }
+
+    /**
+     * @param  string             $campaignName
+     * @param  string             $subject
+     * @param  string             $htmlContent
+     * @param  string|array|null  $listNames
+     * @param  string|null        $fromEmail
+     * @param  string|null        $fromName
+     * @param  string|null        $replyTo
+     * @param  Carbon|null        $scheduledAt
+     * @return bool
+     */
+    public function sendCampaign(
+        string $campaignName,
+        string $subject,
+        string $htmlContent,
+        $listNames = null,
+        $fromEmail = null,
+        $fromName = null,
+        $replyTo = null,
+        Carbon $scheduledAt = null
+    ) {
+        try {
+            $this->getCampaignAPIInstance()->createEmailCampaign(
+                new CreateEmailCampaign([
+                    'name'        => $campaignName,
+                    'htmlContent' => $htmlContent,
+                    'subject'     => $subject,
+                    'recipients'  => [
+                        'listIds' => $this->getListIdsFromNames($listNames)->all(),
+                    ],
+                    'sender'      => [
+                        'email' => $fromEmail ?? config('mail.from.address'),
+                        'name'  => $fromName ?? config('mail.from.name'),
+                    ],
+                    'replyTo'     => $replyTo,
+                    'scheduledAt' => value($scheduledAt ?? now()->addMinutes(5))->toISOString(),
+                ])
+            );
+
+            return true;
+        } catch (Exception $e) {
+            throw LaravelNewsletterException::sendCampaignFailed($e->getMessage());
+        }
     }
 }
