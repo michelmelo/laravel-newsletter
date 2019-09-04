@@ -169,40 +169,40 @@ class SendInBlueProvider implements Newsletter
 
     /**
      * @param  string             $campaignName
-     * @param  string             $fromEmail
-     * @param  string             $fromName
-     * @param  string             $htmlContent
      * @param  string             $subject
-     * @param  string             $replyTo
+     * @param  string             $htmlContent
      * @param  string|array|null  $listNames
+     * @param  string|null        $fromEmail
+     * @param  string|null        $fromName
+     * @param  string|null        $replyTo
      * @param  Carbon|null        $scheduledAt
      * @return bool
      */
     public function sendCampaign(
         string $campaignName,
-        string $fromEmail,
-        string $fromName,
-        string $htmlContent,
         string $subject,
-        string $replyTo,
+        string $htmlContent,
         $listNames = null,
+        $fromEmail = null,
+        $fromName = null,
+        $replyTo = null,
         Carbon $scheduledAt = null
     ) {
         try {
             $this->getCampaignAPIInstance()->createEmailCampaign(
                 new CreateEmailCampaign([
                     'name'        => $campaignName,
-                    'sender'      => [
-                        'email' => $fromEmail,
-                        'name'  => $fromName,
-                    ],
+                    'htmlContent' => $htmlContent,
+                    'subject'     => $subject,
                     'recipients'  => [
                         'listIds' => $this->getListIdsFromNames($listNames)->all(),
                     ],
-                    'htmlContent' => $htmlContent,
-                    'subject'     => $subject,
+                    'sender'      => [
+                        'email' => $fromEmail ?? config('mail.from.address'),
+                        'name'  => $fromName ?? config('mail.from.name'),
+                    ],
                     'replyTo'     => $replyTo,
-                    'scheduledAt' => value($scheduledAt ?? now()->addMinutes(10))->toISOString(),
+                    'scheduledAt' => value($scheduledAt ?? now()->addMinutes(5))->toISOString(),
                 ])
             );
 
