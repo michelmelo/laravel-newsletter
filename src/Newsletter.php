@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool resubscribe(string $email)
  * @method static bool addToLists(string $email, $listNames = null)
  * @method static bool removeFromLists(string $email, $listNames = null)
- * @method static bool sendCampaign(string $campaignName, string $fromEmail, string $fromName, string $htmlContent, string $subject, string $replyTo, $listNames = null, Carbon $scheduledAt = null)
+ * @method static bool sendCampaign(string $campaignName, string $subject, string $htmlContent, $listNames = null, $fromEmail = null, $fromName = null, $replyTo = null, Carbon $scheduledAt = null)
  * @method static bool getContact(string $email)
  * @method static bool isSubscribed(string $email, $listId = null)
  * @method static bool updateEmailAddress(string $oldEmail, string $newEmail)
