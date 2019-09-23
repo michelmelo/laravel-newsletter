@@ -14,23 +14,15 @@ class NewsletterManager extends Manager
     private $listCollection;
 
     /**
-     * @var array
-     */
-    private $config;
-
-    /**
      * NewsletterManager constructor.
      *
      * @param                            $app
      * @param  NewsletterListCollection  $listCollection
-     * @param  array                     $config
      */
-    public function __construct($app, NewsletterListCollection $listCollection, array $config)
+    public function __construct($app, NewsletterListCollection $listCollection)
     {
         parent::__construct($app);
-
         $this->listCollection = $listCollection;
-        $this->config = $config;
     }
 
     /**
@@ -49,7 +41,7 @@ class NewsletterManager extends Manager
         return new SendInBlueProvider(
             $this->guzzle(),
             $this->listCollection,
-            $this->config['credentials']
+            $this->config->get('newsletter.credentials')
         );
     }
 
@@ -61,7 +53,8 @@ class NewsletterManager extends Manager
     protected function guzzle()
     {
         return new HttpClient(Arr::add(
-            $this->config['provider_options']['guzzle'] ?? [], 'connect_timeout', 60
+            $this->config->get('newsletter.provider_options.guzzle', []),
+            'connect_timeout', 60
         ));
     }
 
@@ -72,6 +65,6 @@ class NewsletterManager extends Manager
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['newsletter.driver'] ?? 'null';
+        return $this->config->get('newsletter.driver', 'null');
     }
 }

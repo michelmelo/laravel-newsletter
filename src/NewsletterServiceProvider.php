@@ -27,8 +27,7 @@ class NewsletterServiceProvider extends ServiceProvider
 
         $this->app->singleton('newsletter', function ($app) {
             return new NewsletterManager($app,
-                NewsletterListCollection::createFromConfig(config('newsletter')),
-                config('newsletter')
+                NewsletterListCollection::createFromConfig(config('newsletter'))
             );
         });
     }
