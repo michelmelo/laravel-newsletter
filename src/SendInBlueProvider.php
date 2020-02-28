@@ -18,7 +18,6 @@ use SendinBlue\Client\Model\AddContactToList;
 use SendinBlue\Client\Model\CreateEmailCampaign;
 use SendinBlue\Client\Model\RemoveContactFromList;
 use Leeovery\LaravelNewsletter\Contracts\Newsletter;
-use SendinBlue\Client\Model\GetExtendedContactDetails;
 use Leeovery\LaravelNewsletter\Exceptions\LaravelNewsletterException;
 
 class SendInBlueProvider implements Newsletter
@@ -26,30 +25,20 @@ class SendInBlueProvider implements Newsletter
     /**
      * @var NewsletterListCollection
      */
-    private $lists;
+    private NewsletterListCollection $lists;
 
-    /**
-     * @var Configuration
-     */
-    private $config;
+    private Configuration $config;
 
     /**
      * @var HttpClient
      */
-    private $guzzle;
+    private HttpClient $guzzle;
 
     /**
      * @var array
      */
-    private $credentials;
+    private array $credentials;
 
-    /**
-     * SendInBlueProvider constructor.
-     *
-     * @param  HttpClient                $guzzle
-     * @param  NewsletterListCollection  $lists
-     * @param  array                     $credentials
-     */
     public function __construct(HttpClient $guzzle, NewsletterListCollection $lists, array $credentials)
     {
         $this->guzzle = $guzzle;
@@ -59,10 +48,6 @@ class SendInBlueProvider implements Newsletter
                                      ->setApiKey('api-key', $credentials['api_key']);
     }
 
-    /**
-     * @param  string  $email
-     * @return bool
-     */
     public function unsubscribe(string $email)
     {
         try {
@@ -76,23 +61,14 @@ class SendInBlueProvider implements Newsletter
         }
     }
 
-    /**
-     * @return ContactsApi
-     */
     private function getContactsAPIInstance(): ContactsApi
     {
         return new ContactsApi($this->guzzle, $this->config);
     }
 
-    /**
-     * @param  string             $email
-     * @param  array|string|null  $listNames
-     * @return bool
-     */
     public function addToLists(string $email, $listNames = null)
     {
         try {
-
             $this->getListIdsFromNames($listNames)->each(function ($listId) use ($email) {
                 $this->getContactsAPIInstance()->addContactToList(
                     $listId,
@@ -106,25 +82,13 @@ class SendInBlueProvider implements Newsletter
         }
     }
 
-    /**
-     * @param $listNames
-     * @return Collection
-     */
     private function getListIdsFromNames($listNames): Collection
     {
-        return collect(Arr::wrap($listNames ?: ''))->map(function ($name) {
-            return $this->lists->findByName($name);
-        })->map(function (NewsletterList $list) {
-            return (int) $list->getId();
-        });
+        return collect(Arr::wrap($listNames ?: ''))
+            ->map(fn($name) => $this->lists->findByName($name))
+            ->map(fn(NewsletterList $list) => (int) $list->getId());
     }
 
-    /**
-     * @param  string             $email
-     * @param  array|string|null  $listNames
-     * @param  array              $attributes
-     * @return bool
-     */
     public function subscribe(string $email, $listNames = null, array $attributes = [])
     {
         $createContact = new CreateContact([
@@ -134,7 +98,7 @@ class SendInBlueProvider implements Newsletter
             'updateEnabled'    => true,
         ]);
 
-        if (!empty($attributes)) {
+        if (! empty($attributes)) {
             $createContact->setAttributes($attributes);
         }
 
@@ -147,11 +111,6 @@ class SendInBlueProvider implements Newsletter
         }
     }
 
-    /**
-     * @param  string             $email
-     * @param  array|string|null  $listNames
-     * @return bool
-     */
     public function removeFromLists(string $email, $listNames = null)
     {
         try {
@@ -169,11 +128,6 @@ class SendInBlueProvider implements Newsletter
         }
     }
 
-    /**
-     * @param  string  $oldEmail
-     * @param  string  $newEmail
-     * @return bool
-     */
     public function updateEmailAddress(string $oldEmail, string $newEmail)
     {
         try {
@@ -199,28 +153,20 @@ class SendInBlueProvider implements Newsletter
         ];
     }
 
-    /**
-     * @return EmailCampaignsApi
-     */
     private function getCampaignAPIInstance(): EmailCampaignsApi
     {
         return new EmailCampaignsApi($this->guzzle, $this->config);
     }
 
-    /**
-     * @param  string    $email
-     * @param  null|int  $listId
-     * @return mixed
-     */
     public function isSubscribed(string $email, $listId = null)
     {
         try {
             if (is_null($listId)) {
-                return !$this->getContact($email)->getEmailBlacklisted();
+                return ! $this->getContact($email)->getEmailBlacklisted();
             }
 
             return in_array($listId, value($contact = $this->getContact($email))->getListIds()) &&
-                !$contact->getEmailBlacklisted();
+                ! $contact->getEmailBlacklisted();
         } catch (Exception $e) {
             if ($e->getCode() !== 404) {
                 throw LaravelNewsletterException::isSubscribedFailed($e->getMessage());
@@ -230,13 +176,6 @@ class SendInBlueProvider implements Newsletter
         return false;
     }
 
-    /**
-     * Will return the contact record from the provider. If user is not
-     * present then false will be returned.
-     *
-     * @param  string  $email
-     * @return bool|GetExtendedContactDetails
-     */
     public function getContact(string $email)
     {
         try {
@@ -250,16 +189,14 @@ class SendInBlueProvider implements Newsletter
         return false;
     }
 
-    /**
-     * @param  string  $email
-     * @return mixed
-     */
     public function resubscribe(string $email)
     {
         try {
-            return $this->getContactsAPIInstance()->updateContact($email,
+            $this->getContactsAPIInstance()->updateContact($email,
                 new UpdateContact(['emailBlacklisted' => false])
             );
+
+            return true;
         } catch (Exception $e) {
             if ($e->getCode() !== 404) {
                 throw LaravelNewsletterException::reSubscribeFailed($e->getMessage());
@@ -279,6 +216,7 @@ class SendInBlueProvider implements Newsletter
      * @param  string|null        $campaignName
      * @return mixed
      * @throws ReflectionException
+     * @throws LaravelNewsletterException
      */
     public function sendMailableToList(
         Mailable $mailable,
@@ -313,6 +251,7 @@ class SendInBlueProvider implements Newsletter
      * @param  string|null        $replyTo
      * @param  Carbon|null        $scheduledAt
      * @return bool
+     * @throws LaravelNewsletterException
      */
     public function sendCampaign(
         string $campaignName,

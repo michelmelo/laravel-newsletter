@@ -6,9 +6,6 @@ use Illuminate\Support\ServiceProvider;
 
 class NewsletterServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap the application services.
-     */
     public function boot()
     {
         if ($this->app->runningInConsole()) {
@@ -18,9 +15,6 @@ class NewsletterServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Register the application services.
-     */
     public function register()
     {
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'newsletter');
@@ -32,11 +26,6 @@ class NewsletterServiceProvider extends ServiceProvider
         });
     }
 
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
     public function provides()
     {
         return ['newsletter'];
