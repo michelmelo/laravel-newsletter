@@ -7,22 +7,13 @@ use Leeovery\LaravelNewsletter\Exceptions\LaravelNewsletterException;
 
 class NewsletterListCollection extends Collection
 {
-    /**
-     * @var string
-     */
-    public $defaultListName = '';
+    public string $defaultListName = '';
 
-    /**
-     * @param  array  $config
-     * @return NewsletterListCollection
-     */
-    public static function createFromConfig(array $config)
+    public static function createFromConfig(array $config): NewsletterListCollection
     {
         return tap(new static($config['lists']), function ($collection) use ($config) {
             return value($collection->defaultListName = $config['default_list_name']);
-        })->transform(function ($listProperties, $name) {
-            return new NewsletterList($name, $listProperties);
-        });
+        })->transform(fn($listProperties, $name) => new NewsletterList($name, $listProperties));
     }
 
     public function findByName(string $name): NewsletterList

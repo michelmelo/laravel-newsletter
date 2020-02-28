@@ -4,11 +4,9 @@ namespace Leeovery\LaravelNewsletter;
 
 class NewsletterList
 {
-    /** @var string */
-    public $name;
+    public string $name;
 
-    /** @var array */
-    public $properties = [];
+    public array $properties = [];
 
     public function __construct(string $name, array $properties)
     {

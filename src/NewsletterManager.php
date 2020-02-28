@@ -8,17 +8,8 @@ use GuzzleHttp\Client as HttpClient;
 
 class NewsletterManager extends Manager
 {
-    /**
-     * @var NewsletterListCollection
-     */
-    private $listCollection;
+    private NewsletterListCollection $listCollection;
 
-    /**
-     * NewsletterManager constructor.
-     *
-     * @param                            $app
-     * @param  NewsletterListCollection  $listCollection
-     */
     public function __construct($app, NewsletterListCollection $listCollection)
     {
         parent::__construct($app);
@@ -33,10 +24,7 @@ class NewsletterManager extends Manager
         return new NullDriver;
     }
 
-    /**
-     * @return SendInBlueProvider
-     */
-    public function createSendInBlueDriver()
+    public function createSendInBlueDriver(): SendInBlueProvider
     {
         return new SendInBlueProvider(
             $this->guzzle(),
@@ -45,12 +33,7 @@ class NewsletterManager extends Manager
         );
     }
 
-    /**
-     * Get a fresh Guzzle HTTP client instance.
-     *
-     * @return HttpClient
-     */
-    protected function guzzle()
+    protected function guzzle(): HttpClient
     {
         return new HttpClient(Arr::add(
             $this->config->get('newsletter.provider_options.guzzle', []),
@@ -58,12 +41,7 @@ class NewsletterManager extends Manager
         ));
     }
 
-    /**
-     * Get the default driver name.
-     *
-     * @return string
-     */
-    public function getDefaultDriver()
+    public function getDefaultDriver(): string
     {
         return $this->config->get('newsletter.driver', 'null');
     }
