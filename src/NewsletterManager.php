@@ -43,6 +43,6 @@ class NewsletterManager extends Manager
 
     public function getDefaultDriver(): string
     {
-        return $this->config->get('newsletter.driver', 'null');
+        return 'null'; //$this->config->get('newsletter.driver', 'null');
     }
 }
